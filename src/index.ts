@@ -48,12 +48,8 @@ export async function generateSchema({ url, headers, outputPath }: Config) {
     .join('\n');
 
   if (outputPath) {
-    if (!window) {
-      const writeFilePromise = util.promisify(fs.writeFile);
-      return writeFilePromise(outputPath, tsTypes);
-    } else {
-      return null;
-    }
+    const writeFilePromise = util.promisify(fs.writeFile);
+    return writeFilePromise(outputPath, tsTypes);
   } else {
     return tsTypes;
   }
