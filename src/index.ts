@@ -1,6 +1,7 @@
 import { avroToTypeScript, RecordType } from 'avro-typescript';
 import axios from 'axios';
-import fs from 'fs';
+import * as fs from 'fs';
+import * as util from 'util';
 
 type Config = SchemaRegistryConnectionConfig & {
   outputPath?: string;
@@ -46,7 +47,14 @@ export async function generateSchema({ url, headers, outputPath }: Config) {
     .sort((a, b) => a.split(' ')[2].localeCompare(b.split(' ')[2]))
     .join('\n');
 
-  fs.writeFile(outputPath ? outputPath : './src/kafkaTypes.ts', tsTypes, () =>
-    console.log('✨ Typescript types generated from schema registry.')
-  );
+  if (outputPath) {
+    if (!window) {
+      const writeFilePromise = util.promisify(fs.writeFile);
+      return writeFilePromise(outputPath, tsTypes);
+    } else {
+      return null;
+    }
+  } else {
+    return tsTypes;
+  }
 }
